@@ -1,0 +1,59 @@
+﻿@model List<SAPSCaseManagement5.ViewModels.CrimeTypeViewModel>
+@using Newtonsoft.Json
+
+
+@{
+    ViewData["Title"] = "Types of Crimes Committed";
+}
+
+<h2>Types of Crimes Committed</h2>
+
+<ul>
+    @foreach (var crime in Model)
+    {
+        <li>@crime.OffenseName: @crime.Count</li> <!-- Display offense name and count -->
+    }
+</ul>
+
+<canvas id="crimeDoughnutChart" width="400" height="200"></canvas>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('crimeDoughnutChart').getContext('2d');
+        var crimeDoughnutChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(JsonConvert.SerializeObject(Model.Select(m => m.OffenseName))),
+                datasets: [{
+                    label: 'Number of Crimes',
+                    data: @Html.Raw(JsonConvert.SerializeObject(Model.Select(m => m.Count))),
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)'
+                    ],
+                    borderColor: 'rgba(255, 255, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Crime Statistics'
+                    }
+                }
+            }
+        });
+    </script>
+}
+
+
+

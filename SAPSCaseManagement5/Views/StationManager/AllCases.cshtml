@@ -1,0 +1,116 @@
+﻿@model List<SAPSCaseManagement5.Models.CriminalRecord>
+
+<!-- Success and Error Messages -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Validation Summary -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<h2>All Criminal Cases</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Offense</th>
+            <th>Count</th>
+            <th>Average Sentence (Years)</th>
+            <th>Last Issue Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @* Grouping records by Offense *@
+        @foreach (var offenseGroup in Model
+        .GroupBy(r => r.Offense?.OffenseName ?? "Unknown Offense")
+        .Select(g => new
+        {
+           OffenseName = g.Key,
+           Count = g.Count(),
+           AverageSentence = g.Average(x => x.Sentence),
+           LastIssueDate = g.Max(x => x.IssueDate)
+        }))
+        {
+            <tr>
+                <td>@offenseGroup.OffenseName</td>
+                <td>@offenseGroup.Count</td>
+                <td>@offenseGroup.AverageSentence</td>
+                <td>@offenseGroup.LastIssueDate.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- Chart Container -->
+<div style="width: 100%; height: 400px;">
+    <canvas id="criminalCasesChart"></canvas>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Prepare data for the chart
+            var offenseNames = @Html.Raw(Json.Serialize(Model.GroupBy(r => r.Offense?.OffenseName ?? "Unknown Offense").Select(g => g.Key)));
+            var offenseCounts = @Html.Raw(Json.Serialize(Model.GroupBy(r => r.Offense?.OffenseName ?? "Unknown Offense").Select(g => g.Count())));
+
+            // Create the chart
+            var ctx = document.getElementById('criminalCasesChart').getContext('2d');
+            var criminalCasesChart = new Chart(ctx, {
+                type: 'bar', // Change this to 'line', 'pie', etc. for different chart types
+                data: {
+                    labels: offenseNames,
+                    datasets: [{
+                        label: 'Number of Crimes Committed',
+                        data: offenseCounts,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Crimes'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Offenses'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+@* <a href="javascript:history.back()" class="btn btn-secondary">Return Back</a> *@

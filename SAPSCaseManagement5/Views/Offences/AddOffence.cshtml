@@ -1,0 +1,53 @@
+﻿@model SAPSCaseManagement5.Models.Offense
+
+<!-- Success and Error Messages -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Validation Summary -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<h2>Add New Offence</h2>
+
+<form asp-action="AddOffence" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="form-group">
+        <label for="OffenseName">Offense Name</label>
+        <input asp-for="OffenseName" class="form-control" />
+        <span asp-validation-for="OffenseName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group d-flex justify-content-between">
+        <button type="submit" class="btn btn-primary">Add Offense</button>
+        <a href="javascript:history.back()" class="btn btn-secondary">Return Back</a>
+    </div>
+
+   
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

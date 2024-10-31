@@ -1,0 +1,25 @@
+﻿@* @model List<CrimeStatsViewModel>
+List<
+
+<h2>Crime Statistics</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Offense ID</th>
+            <th>Total Crimes</th>
+            <th>Year</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var stat in Model)
+        {
+            <tr>
+                <td>@stat.OffenseId</td>
+                <td>@stat.TotalCrimes</td>
+                <td>@stat.Year</td>
+            </tr>
+        }
+    </tbody>
+</table> *@
+

@@ -1,0 +1,126 @@
+﻿@model List<SAPSCaseManagement5.ViewModels.SuspectOffenseCountViewModel>
+
+<h2 class="mt-4">Suspect Offenses Dashboard</h2>
+
+<!-- Search Input -->
+<div class="mb-3">
+    <input type="text" id="searchInput" placeholder="Search by name" class="form-control" onkeyup="searchTable()" />
+</div>
+
+<!-- Data Table -->
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Full Name</th>
+                <th>Offense Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model == null || !Model.Any())
+            {
+                <tr>
+                    <td colspan="2" class="text-center">No data available.</td>
+                </tr>
+            }
+            else
+            {
+                foreach (var suspect in Model)
+                {
+                    <tr>
+                        <td>@suspect.FullName</td>
+                        <td>@suspect.OffenseCount</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    
+</div>
+
+<!-- Export Button -->
+<div class="mb-3">
+    <button id="exportBtn" class="btn btn-primary" onclick="exportTableToCSV('suspect_offenses.csv')">Export to CSV</button>
+</div>
+
+<!-- Chart Section -->
+<div class="mt-4">
+    <canvas id="offenseChart" width="400" height="200"></canvas>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Generate chart data from the model
+        var labels = @Html.Raw(Json.Serialize(Model.Select(s => s.FullName)));
+        var data = @Html.Raw(Json.Serialize(Model.Select(s => s.OffenseCount)));
+
+        var ctx = document.getElementById('offenseChart').getContext('2d');
+        var offenseChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Offense Count per Suspect',
+                    data: data,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Search function for the table
+        function searchTable() {
+            var input = document.getElementById("searchInput");
+            var filter = input.value.toLowerCase();
+            var table = document.getElementsByTagName("table")[0];
+            var tr = table.getElementsByTagName("tr");
+
+            for (var i = 1; i < tr.length; i++) {
+                var td = tr[i].getElementsByTagName("td")[0]; // Search only in the first column (Full Name)
+                if (td) {
+                    var txtValue = td.textContent || td.innerText;
+                    tr[i].style.display = txtValue.toLowerCase().indexOf(filter) > -1 ? "" : "none";
+                }
+            }
+        }
+
+        // Export table to CSV function
+        function exportTableToCSV(filename) {
+            var csv = [];
+            var rows = document.querySelectorAll("table tr");
+
+            for (var i = 0; i < rows.length; i++) {
+                var row = [], cols = rows[i].querySelectorAll("td, th");
+
+                for (var j = 0; j < cols.length; j++) {
+                    row.push(cols[j].innerText);
+                }
+
+                csv.push(row.join(","));
+            }
+
+            var csv_file = new Blob([csv.join("\n")], { type: "text/csv" });
+            var download_link = document.createElement("a");
+            download_link.download = filename;
+            download_link.href = window.URL.createObjectURL(csv_file);
+            download_link.style.display = "none";
+
+            document.body.appendChild(download_link);
+            download_link.click();
+        }
+    </script>
+}
+
+
+@* <a href="javascript:history.back()" class="btn btn-secondary btn-lg">Return Back</a> *@

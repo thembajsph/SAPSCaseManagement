@@ -1,0 +1,93 @@
+﻿@model IEnumerable<SAPSCaseManagement5.Models.CaseManager>
+
+@{
+    ViewData["Title"] = "Case Manager Tasks";
+}
+
+<!-- Success and Error Messages -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<!-- Validation Summary -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<h1>Case Manager Tasks</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Case Manager</th>
+            <th>Case ID</th>
+            <th>Offense</th>
+            <th>Status</th>
+            <th>Suspect</th>
+            <th>Issued On</th>
+            <th>Sentence</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var caseManager in Model)
+        {
+            // Check if there are CriminalRecords for the current CaseManager
+            if (caseManager.CriminalRecords != null && caseManager.CriminalRecords.Any())
+            {
+                // Loop through each CriminalRecord of the CaseManager
+                foreach (var caseItem in caseManager.CriminalRecords)
+                {
+                    <tr>
+                        @if (caseItem == caseManager.CriminalRecords.First())
+                        {
+                            <td rowspan="@caseManager.CriminalRecords.Count()">@caseManager.ManagerName</td>
+                        }
+                        <td>@caseItem.CriminalRecordId</td>
+                        <td>@caseItem.Offense?.OffenseName</td>
+                        <td>@caseItem.Status</td>
+                        <td>@caseItem.Suspect?.FirstName</td>
+                        <td>@caseItem.IssueDate.ToShortDateString()</td>
+                        <td>@caseItem.Sentence</td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="6" class="text-right">
+                        <a asp-action="Terminate" asp-route-id="@caseManager.CaseManagerId" class="btn btn-danger">Terminate</a>
+                    </td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td>@caseManager.ManagerName</td>
+                    <td colspan="6">No cases assigned</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+
+<a href="javascript:history.back()" class="btn btn-secondary">Return Back</a>

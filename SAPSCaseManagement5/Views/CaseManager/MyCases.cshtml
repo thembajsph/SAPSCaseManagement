@@ -1,0 +1,121 @@
+﻿@model List<SAPSCaseManagement5.Models.CriminalRecord>
+@using Newtonsoft.Json
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using SAPSCaseManagement5.Models
+
+
+<div class="container mt-5 p-4 bg-light rounded shadow-lg">
+    <!-- Success and Error Messages -->
+    @* (Your success and error messages code here) *@
+
+    <div class="text-center mb-4">
+        <h2 class="display-5">My Assigned Cases</h2>
+        <p class="text-muted">Review the cases assigned to you along with their details.</p>
+    </div>
+
+    @if (Model == null || !Model.Any()) // Check if the model is null or empty
+    {
+        <div class="alert alert-info text-center">
+            <h3>No Cases Assigned</h3>
+            <p>There are currently no cases assigned to your account.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive mb-4">
+            <table class="table table-striped table-hover align-middle border rounded">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Offense</th>
+                        <th>Sentence (Years)</th>
+                        <th>Issue Date</th>
+                        <th>Suspect</th>
+                        <th>Status</th>
+                        <th>Case Manager</th>
+                       @*  <th>Action</th> *@
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var record in Model)
+                    {
+                        <tr>
+                            <td>@record.Offense?.OffenseName</td>
+                            <td>@record.Sentence</td>
+                            <td>@record.IssueDate.ToShortDateString()</td>
+                            <td>@record.Suspect.FirstName @record.Suspect.LastName</td>
+                            <td>@record.Status</td>
+                            <td>@record.CaseManager?.ManagerName</td>
+                            <td>
+                               @*  <a href="@Url.Action("Details", "Cases", new { id = record.CriminalRecordId })" class="btn btn-info btn-sm">View Details</a> *@
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            
+        </div>
+
+        <!-- Chart Section -->
+        <div class="mt-5 p-4 bg-white rounded shadow">
+            <h3 class="text-center text-primary">Case Distribution by Offense Type</h3>
+            <canvas id="casesChart" width="400" height="200"></canvas>
+        </div>
+
+        @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <script>
+            // Prepare the data for the chart
+            var offenses = @Html.Raw(JsonConvert.SerializeObject(Model.Select(m => m.Offense?.OffenseName).Distinct().ToList()));
+            var offenseCounts = @Html.Raw(JsonConvert.SerializeObject(Model
+            .GroupBy(m => m.Offense?.OffenseName ?? "Unknown")
+            .Select(g => g.Count()).ToList()));
+
+            // Create the chart
+            var ctx = document.getElementById('casesChart').getContext('2d');
+            var casesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: offenses,
+                    datasets: [{
+                        label: 'Number of Cases by Offense Type',
+                        data: offenseCounts,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Cases'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Offenses'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    }
+                }
+            });
+        </script>
+        }
+
+}
+
+    <div class="d-flex justify-content-end mt-3">
+        <a href="javascript:history.back()" class="btn btn-secondary btn-lg">Return Back</a>
+    </div>

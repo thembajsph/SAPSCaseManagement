@@ -1,0 +1,28 @@
+﻿@model List<SAPSCaseManagement5.Models.Suspect>
+
+    <h2>List of Suspects</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID Number</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var suspect in Model)
+            {
+                <tr>
+                    <td>@suspect.IDNumber</td>
+                    <td>@suspect.FirstName</td>
+                    <td>@suspect.LastName</td>
+                    <td>
+                        <a asp-action="SuspectDetails" asp-route-suspectId="@suspect.SuspectId" class="btn btn-info">View Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+<a href="javascript:history.back()" class="btn btn-secondary btn-lg">Return Back</a>

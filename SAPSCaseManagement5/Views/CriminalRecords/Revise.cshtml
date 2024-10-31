@@ -1,0 +1,145 @@
+﻿@model SAPSCaseManagement5.Models.CriminalRecord
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Revise Criminal Record</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.3/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- Display Success and Error Messages -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <h2 class="text-center mb-4">Revise Criminal Record</h2>
+
+        <form id="reviseRecordForm" method="post" asp-controller="CriminalRecords" asp-action="Revise">
+            <input type="hidden" asp-for="CriminalRecordId" value="@Model.CriminalRecordId" />
+
+            <div class="form-group mb-3">
+                <label class="form-label">Offense:</label>
+                <div class="form-control-plaintext">@Model.Offense?.OffenseName</div>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Sentence" class="form-label">Sentence (years):</label>
+                <input type="number" class="form-control" asp-for="Sentence" required />
+                <span asp-validation-for="Sentence" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Status" class="form-label">Status:</label>
+                <input type="text" class="form-control" asp-for="Status" required />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="caseManagerSelect" class="form-label">Case Manager:</label>
+                <div class="input-group">
+                    <select id="caseManagerSelect" name="CaseManagerId" class="form-select">
+                        <option value="">Select a Case Manager</option>
+                        @if (ViewBag.CaseManagers != null)
+                        {
+                            foreach (var manager in ViewBag.CaseManagers)
+                            {
+                                <option value="@manager.CaseManagerId">@manager.ManagerName</option>
+                            }
+                        }
+                    </select>
+                    <button type="button" id="fetchManagerNameBtn" class="btn btn-info">Get Case Manager Name</button>
+                </div>
+                <div id="caseManagerName" class="mt-2"></div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg">Save</button>
+                <a href="javascript:history.back()" class="btn btn-secondary btn-lg">Return Back</a>
+
+            </div>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Fetch the Case Manager name via AJAX
+            $('#fetchManagerNameBtn').on('click', function () {
+                const caseManagerId = $('#caseManagerSelect').val();
+                if (!caseManagerId) {
+                    alert("Please select a Case Manager.");
+                    return;
+                }
+
+                $.get(`/CriminalRecords/GetCaseManagerName?caseManagerId=${caseManagerId}`)
+                    .done(function (data) {
+                        if (data.success) {
+                            $('#caseManagerName').text(`Selected Case Manager: ${data.name}`).addClass("alert alert-info");
+                        } else {
+                            alert(data.message || "Failed to get case manager name.");
+                        }
+                    })
+                    .fail(function (xhr, status, error) {
+                        alert("An error occurred while fetching the Case Manager name.");
+                    });
+            });
+
+            // Handle form submission via AJAX
+            $('#reviseRecordForm').on('submit', function (event) {
+                event.preventDefault();
+                const formData = $(this).serialize();
+
+                $.ajax({
+                    url: '/CriminalRecords/Revise',
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        if (response && response.success) {
+                            alert(response.message);
+                        } else {
+                            alert(response.message || "Unexpected response received.");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("An error occurred: " + xhr.status + " - " + xhr.statusText);
+                    }
+                });
+            });
+        });
+    </script>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+</body>
+</html>
+

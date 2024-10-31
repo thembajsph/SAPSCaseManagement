@@ -1,0 +1,181 @@
+﻿@model SAPSCaseManagement5.Models.Suspect
+
+@{
+    ViewBag.Title = "Search Suspects";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.3/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+
+        h2, h3, h4 {
+            color: #0056b3; /* Dark blue color for headers */
+        }
+
+        .btn-primary {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+            .btn-primary:hover {
+                background-color: #004494;
+                border-color: #004494;
+            }
+
+        .alert {
+            margin-top: 20px;
+        }
+
+        .table {
+            background-color: white; /* White background for tables */
+            border-radius: 0.5rem; /* Rounded corners */
+            overflow: hidden; /* Ensures rounded corners show */
+        }
+
+            .table th {
+                background-color: #0056b3; /* Dark blue header for tables */
+                color: white;
+            }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #e9ecef; /* Light gray for odd rows */
+        }
+
+        .table-striped tbody tr:hover {
+            background-color: #d1ecf1; /* Light blue on hover */
+        }
+
+        .container {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 0.5rem; /* Rounded container */
+            padding: 20px; /* Padding inside the container */
+            background-color: #ffffff; /* White background for the container */
+        }
+
+        .text-center {
+            margin-top: 30px; /* Spacing above the text-center */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Search Suspects</h2>
+
+        <form method="get" class="mb-4">
+            <div class="input-group">
+                <input name="idNumber" type="text" class="form-control" placeholder="Enter ID Number" required />
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+
+        @if (ViewData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                <strong>Error:</strong> @ViewData["ErrorMessage"]
+            </div>
+        }
+
+        @if (Model != null)
+        {
+            <h3>Details for @Model.FirstName @Model.LastName</h3>
+            <p><strong>ID Number:</strong> @Model.IDNumber</p>
+
+            <!-- Suspect Information Table -->
+            <h4>Suspect Information</h4>
+            <table id="suspectTable" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>ID Number</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Suspect ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@Model.IDNumber</td>
+                        <td>@Model.FirstName</td>
+                        <td>@Model.LastName</td>
+                        <td>@Model.SuspectId</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Criminal Records Table -->
+            @if (Model.CriminalRecords != null && Model.CriminalRecords.Any())
+            {
+                <h4>Criminal Records</h4>
+                <table id="criminalRecordsTable" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Criminal Record ID</th>
+                            <th>Offense</th>
+                            <th>Sentence (Years)</th>
+                            <th>Issue Date</th>
+                            <th>Case Manager</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var record in Model.CriminalRecords)
+                        {
+                            <tr>
+                                <td>@record.CriminalRecordId</td>
+                                <td>@(record.Offense != null ? record.Offense.OffenseName : "N/A")</td>
+                                <td>@record.Sentence</td>
+                                <td>@(record.IssueDate != DateTime.MinValue ? record.IssueDate.ToShortDateString() : "N/A")</td>
+                                <td>@record.CaseManager?.ManagerName</td>
+                                <td>@record.Status</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>No criminal records found for this suspect.</p>
+            }
+        }
+        else
+        {
+            <p>No suspect found.</p>
+        }
+
+        <!-- Return to List Suspects Button -->
+        <div class="text-center mt-4">
+            <a href="http://localhost:5112/Suspects/ListSuspects" class="btn btn-secondary">Return to List of Suspects</a>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.3/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#suspectTable').DataTable({
+                "searching": false,  // Disable searching for the suspect table
+                "paging": false,
+                "ordering": false
+            });
+
+            $('#criminalRecordsTable').DataTable({
+                "searching": true,   // Enable searching for criminal records
+                "paging": true,
+                "ordering": true,
+                "order": [[3, "desc"]]  // Default sorting by Issue Date
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+﻿@{
+    Layout = null; // Prevents using the main layout for this test
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Navbar</title>
+    <link href="~/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* Custom styles for testing */
+        .navbar-light .navbar-nav .nav-link {
+            color: #ffcc00;
+        }
+
+            .navbar-light .navbar-nav .nav-link:hover {
+                color: #ffc107;
+                text-decoration: underline;
+            }
+
+            .navbar-light .navbar-nav .nav-link.active {
+                color: #ffc107;
+                font-weight: bold;
+            }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="@Url.Action("Index", "Home")">SAPSCaseManagement</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "Home")">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "Statistics")">Statistics</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "CaseManager")">Manage Cases</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Dashboard", "Admin")">Admin Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "Admin")">Change Roles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "StationManager")">Manage Cases</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "Suspects")">Police Dashboard</a>
+                        </li>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Dashboard", "Admin")">Admin Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "Admin")">Change Roles</a>
+                            </li>
+                        }
+                        else if (User.IsInRole("Police Officer"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "Suspects")">Police Dashboard</a>
+                            </li>
+                        }
+                        else if (User.IsInRole("Station Manager"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "StationManager")">Manage Cases</a>
+                            </li>
+                        }
+                        else if (User.IsInRole("Case Manager"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "CaseManager")">My Cases</a>
+                            </li>
+                        }
+
+                        <li class="nav-item">
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="form-inline">
+                                @Html.AntiForgeryToken() <!-- Add this to include anti-forgery token -->
+                                <button type="submit" class="btn btn-link nav-link" style="padding: 0; border: none; background: none; color: #ffc107;">
+                                    Logout
+                                </button>
+                            </form>
+                        </li>
+
+                        <li class="nav-item">
+                            <span class="navbar-text" style="color: #ffc107;">
+                                Welcome, @User.Identity.Name!
+                            </span>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Login", "Account")">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Register", "Account")">Register</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Test Navbar</h1>
+        <p>This is a test page for the navbar.</p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,214 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SAPSCaseManagement</title>
+
+    <!-- CSS Links -->
+    <link rel="stylesheet" href="//cdn.datatables.net/2.0.0/css/dataTables.dataTables.min.css" asp-append-version="true" />
+    <link href="~/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/lib/fontawesome-free/css/all.min.css" rel="stylesheet" />
+    <link href="~/lib/adminlte/css/adminlte.min.css" rel="stylesheet" />
+    
+
+    <style>
+        /* Custom styles */
+        body {
+            background-image: url("/css/images/poliska1.jpg"); /* Replace with the correct image path */
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #343a40;
+        }
+
+        .navbar-light .navbar-nav .nav-link {
+            color: #ffcc00; /* Default link color */
+            transition: color 0.3s ease; /* Smooth transition for color change */
+        }
+
+            .navbar-light .navbar-nav .nav-link:hover {
+                color: #ffc107; /* Change color on hover */
+                text-decoration: underline; /* Optional: underline on hover */
+            }
+
+            .navbar-light .navbar-nav .nav-link.active {
+                color: #ffc107; /* Active link color */
+                font-weight: bold; /* Bold for active link */
+            }
+
+
+        footer {
+            background-color: rgba(52, 58, 64, 0.8);
+            color: #ffffff;
+            margin-top: auto;
+        }
+
+            footer p {
+                margin: 0;
+            }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+
+        .navbar-toggler {
+            border: none;
+        }
+
+        .navbar-toggler-icon {
+            background-color: #ffffff;
+        }
+
+        .navbar-collapse {
+    display: block !important; /* Force display block */
+}
+
+        .navbar-text {
+            margin-left: 10px; /* Adjust this value as needed */
+        }
+
+        .form-label {
+            font-weight: bold;
+        }
+
+        /* .btn-primary, .btn-info {
+            margin-top: 15px;
+        } */
+
+        #caseManagerName {
+            font-style: italic;
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand" href="@Url.Action("Index", "Home")">SAPSCaseManagement</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "Home")">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "Statistics")">Statistics</a>
+                            </li>
+                            @* <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "CaseManager")">Case Manager Dashboard</a>
+                            </li> *@
+                            @* <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Dashboard", "Admin")">Admin Dashboard</a>
+                            </li> *@
+                            @* <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "Admin")">Change Roles</a>
+                            </li> *@
+                            @* <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "StationManager")">Station Manager Dashboard</a>
+                            </li> *@
+                            @* <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Index", "Suspects")">Police Dashboard</a>
+                            </li> *@
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="@Url.Action("Dashboard", "Admin")">Admin Dashboard</a>
+                                </li>
+                                @* <li class="nav-item">
+                                    <a class="nav-link" href="@Url.Action("Index", "Admin")">Change Roles</a>
+                                </li> *@
+                            }
+                            else if (User.IsInRole("Police Officer"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="@Url.Action("Index", "Suspects")">Police Dashboard</a>
+                                </li>
+                            }
+                            else if (User.IsInRole("Station Manager"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="@Url.Action("Index", "StationManager")">Station Manager Dashboard</a>
+                                </li>
+                            }
+                            else if (User.IsInRole("Case Manager"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" href="@Url.Action("Index", "CaseManager")">Case Manager Dashboard</a>
+                                </li>
+                            }
+
+                            <li class="nav-item d-flex align-items-center">
+                                <div class="form-inline me-2">
+                                    <!-- Add margin-end for spacing -->
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        @Html.AntiForgeryToken() <!-- Add this to include anti-forgery token -->
+                                        <button type="submit" class="btn btn-link nav-link" style="padding: 0; border: none; background: none; color: #ffc107;">
+                                            Logout
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="navbar-text" style="color: #ffc107;">
+                                    Welcome, @User.Identity.Name!
+                                </div>
+                            </li>
+
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Login", "Account")">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="@Url.Action("Register", "Account")">Register</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main" class="container">
+        <div class="my-4">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="border-top text-center text-muted py-3">
+        <div class="container">
+            <p>© 2024 SAPSCaseManagement. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JS Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery first -->
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="//cdn.datatables.net/2.0.0/js/dataTables.min.js" asp-append-version="true"></script>
+    <script src="~/lib/adminlte/js/adminlte.min.js"></script>
+
+    @RenderSection("Scripts", required: false) <!-- Add this line -->
+</body>
+</html>
+
+

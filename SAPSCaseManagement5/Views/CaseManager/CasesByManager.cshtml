@@ -1,0 +1,159 @@
+﻿@model SAPSCaseManagement5.ViewModels.CaseManagerCasesViewModel
+
+@{
+    ViewData["Title"] = "Cases for " + Model.ManagerName;
+}
+
+<div class="container mt-4">
+    <div class="card border-primary shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2>Cases for @Model.ManagerName</h2>
+        </div>
+        <div class="card-body">
+
+            <!-- Search Bar -->
+            <div class="mb-4">
+                <input type="text" id="searchBar" placeholder="Search cases..." class="form-control border-info shadow-sm" />
+            </div>
+
+            <!-- Cases Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Case ID</th>
+                            <th>Offense</th>
+                            <th>Status</th>
+                            <th>Sentence (Years)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="caseTableBody">
+                        @foreach (var record in Model.CriminalRecords)
+                        {
+                            <tr data-case-id="@record.CriminalRecordId" class="case-row">
+                                <td>@record.CriminalRecordId</td>
+                                <td>@record.Offense.OffenseName</td>
+                                <td>
+                                    <span class="badge status-@record.Status.ToLower()">@record.Status</span>
+                                </td>
+                                <td>@record.Sentence</td>
+                                <td>
+                                    <button class="btn btn-info btn-sm" onclick="goToRevisePage(@record.CriminalRecordId)">Edit</button>
+                                    <!-- Uncomment delete button if needed -->
+                                    @* <button class="btn btn-danger btn-sm" onclick="confirmDelete(@record.CriminalRecordId)">Delete</button> *@
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Case Modal -->
+<div class="modal fade" id="editCaseModal" tabindex="-1" role="dialog" aria-labelledby="editCaseModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="editCaseModalLabel">Edit Case</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editCaseForm">
+                    <input type="hidden" name="CriminalRecordId" id="modalCriminalRecordId" />
+                    <div class="form-group">
+                        <label for="modalStatus">Status</label>
+                        <select class="form-control" name="Status" id="modalStatus">
+                            <option value="Open">Open</option>
+                            <option value="Closed">Closed</option>
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalSentence">Sentence (Years)</label>
+                        <input type="number" class="form-control" id="modalSentence" name="Sentence" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveChangesButton">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Search functionality
+        document.getElementById('searchBar').addEventListener('keyup', function () {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.case-row');
+            rows.forEach(row => {
+                const caseId = row.cells[0].innerText.toLowerCase();
+                const offense = row.cells[1].innerText.toLowerCase();
+                if (caseId.includes(searchTerm) || offense.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        // Redirect to Revise page
+        function goToRevisePage(criminalRecordId) {
+            window.location.href = `/CriminalRecords/Revise/${criminalRecordId}`;
+        }
+
+        // Confirm delete
+        function confirmDelete(criminalRecordId) {
+            if (confirm('Are you sure you want to delete this case?')) {
+                fetch(`/Cases/Delete/${criminalRecordId}`, {
+                    method: 'DELETE'
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload(); // Reload to reflect changes
+                        } else {
+                            alert('Error deleting case.');
+                        }
+                    });
+            }
+        }
+    </script>
+}
+
+<a href="javascript:history.back()" class="btn btn-secondary btn-lg mt-3">Return Back</a>
+
+<style>
+    .status-open {
+        background-color: #28a745; /* Green */
+        color: rebeccapurple;
+    }
+
+    .status-closed {
+        background-color: #dc3545; /* Red */
+        color: deepskyblue;
+    }
+
+    .status-pending {
+        background-color: #ffc107; /* Yellow */
+        color: black;
+    }
+
+    .status-in-progress {
+        background-color: #17a2b8; /* Blue */
+        color: green;
+    }
+
+    .status-completed {
+        background-color: #17a2b8; /* Blue */
+        color: lawngreen;
+    }
+</style>

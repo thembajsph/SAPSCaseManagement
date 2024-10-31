@@ -1,0 +1,94 @@
+﻿@model SAPSCaseManagement5.Models.Suspect
+
+@{
+    ViewBag.Title = "List of Suspects";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.3/css/jquery.dataTables.min.css">
+    <!-- Bootstrap CSS (optional, for better styling) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- jQuery (required for DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.3/js/jquery.dataTables.min.js"></script>
+
+    <style>
+        /* Custom styles to align text and remove extra space */
+        th, td {
+            text-align: center; /* Center align text in table headers and cells */
+            padding: 8px; /* Adjust padding for better spacing */
+        }
+
+        .table th {
+            vertical-align: middle; /* Vertically align table headers */
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-light text-center py-3 mb-4">
+        <h1>@ViewBag.Title</h1>
+    </header>
+
+    <div class="container">
+        <div class="mb-3 text-right">
+            <!-- Button to navigate to Search page -->
+            <a href="http://localhost:5112/Home/Search" class="btn btn-secondary">Go to Search Page</a>
+        </div>
+
+        <table id="dataTable" class="table table-bordered table-hover table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>ID Number</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var suspect in ViewBag.Suspects as List<Suspect>)
+                {
+                    <tr>
+                        <td>@suspect.FirstName</td>
+                        <td>@suspect.LastName</td>
+                        <td>@suspect.IDNumber</td>
+                        <td>
+                            <!-- Button to Add Criminal Record for this Suspect -->
+                            <a href="@Url.Action("Edit", "CriminalRecords", new { suspectId = suspect.SuspectId })" class="btn btn-primary">
+                                Update Criminal Record
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <footer class="bg-light text-center py-3 mt-4">
+        <p>&copy; 2024 SAPS Case Management</p>
+    </footer>
+
+    @section scripts
+    {
+        <script>
+            $(document).ready(function () {
+                $('#dataTable').DataTable({
+                    // You can customize DataTable options here
+                    "searching": true, // Enable searching
+                    "paging": true,    // Enable pagination
+                    "ordering": true,  // Enable column ordering
+                });
+            });
+        </script>
+    }
+</body>
+</html>
+
+@* <a href="javascript:history.back()" class="btn btn-secondary btn-lg">Return Back</a> *@
+

@@ -1,0 +1,14 @@
+﻿@model SAPSCaseManagement5.Models.CaseManager
+
+
+@{
+    ViewData["Title"] = "Case Manager Dashboard";
+}
+
+<h2>Case Manager Dashboard</h2>
+
+<a href="/CaseManager/MyCases" class="btn btn-primary">View My Cases</a>
+<a href="/CaseManager/CasesByManager?managerId=@ViewBag.CaseManagerId" class="btn btn-secondary">Cases by Manager</a>
+
+<a href="/CaseManager/Dashboard" class="btn btn-primary">View Dashboard</a>
+

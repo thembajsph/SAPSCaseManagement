@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "SAPS Case Management System";
+}
+
+@{
+    Layout = "_Layout";
+}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header text-center">
+            <h3>SAPS Case Management System</h3>
+        </div>
+        <div class="card-body text-center">
+            <p>Welcome! Please log in or register to continue.</p>
+
+            @if (!User.Identity.IsAuthenticated)
+            {
+                <!-- Show Login and Register buttons when user is not logged in -->
+                <a href="/Account/Login" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </a>
+                <a href="/Account/Register" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-user-plus"></i> Register
+                </a>
+            }
+            else
+            {
+                <!-- Show only the Register button when user is logged in -->
+                <a href="/Account/Register" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-user-plus"></i> Register
+                </a>
+            }
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,86 @@
+﻿@model List<SAPSCaseManagement5.ViewModels.CompletedCaseViewModel>;
+
+@using Newtonsoft.Json
+
+@{
+    ViewData["Title"] = "Completed Cases";
+}
+
+<h2>Completed Cases</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Offense</th>
+            <th>Suspect</th>
+            <th>Case Manager</th>
+            <th>Sentence (Years)</th>
+            <th>Issue Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var record in Model)
+        {
+            <tr>
+                <td>@record.OffenseName</td>
+                <td>@record.SuspectName</td>
+                <td>@record.CaseManager</td>
+                <td>@record.Sentence</td>
+                <td>@record.IssueDate.ToShortDateString()</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h3>Statistics</h3>
+<canvas id="crimeStatsChart" width="400" height="200"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Prepare data for the chart
+    var offenses = @Html.Raw(JsonConvert.SerializeObject(Model.Select(m => m.OffenseName).Distinct()));
+    var offenseCounts = @Html.Raw(JsonConvert.SerializeObject(Model.GroupBy(m => m.OffenseName)
+        .Select(g => g.Count())));
+
+    // Create the line chart
+    var ctx = document.getElementById('crimeStatsChart').getContext('2d');
+    var crimeStatsChart = new Chart(ctx, {
+        type: 'line', // Line chart type
+        data: {
+            labels: offenses,
+            datasets: [{
+                label: 'Number of Cases by Offense',
+                data: offenseCounts,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: false, // Do not fill the area under the line
+                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(75, 192, 192, 1)'
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Cases'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Offenses'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true
+                }
+            }
+        }
+    });
+</script>

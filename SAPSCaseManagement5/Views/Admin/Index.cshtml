@@ -1,0 +1,83 @@
+﻿@model List<SAPSCaseManagement5.ViewModels.UserRolesViewModel>
+
+<!-- Success and Error Messages -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<!-- Validation Summary -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <strong>Validation Errors:</strong>
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<h2 class="mt-4 mb-3">Manage User Roles</h2>
+
+<!-- User Roles Table -->
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@string.Join(", ", user.Roles)</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <!-- Assign Role Form -->
+                            <form asp-action="AddUserToRole" method="post" class="me-2">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <select name="role" class="form-select form-select-sm" aria-label="Role selection">
+                                    <option value="Admin">Admin</option>
+                                    <option value="Police Officer">Police Officer</option>
+                                    <option value="Case Manager">Case Manager</option>
+                                    <option value="Station Manager">Station Manager</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary btn-sm mt-1">Assign Role</button>
+                            </form>
+
+                            <!-- Undo Role Button -->
+                            <form asp-action="UndoRoleChange" method="post">
+                                <input type="hidden" name="userId" value="@user.UserId" />
+                                <button type="submit" class="btn btn-warning btn-sm mt-1">Undo</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<a href="javascript:history.back()" class="btn btn-secondary">Return Back</a>

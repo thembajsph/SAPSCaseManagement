@@ -1,0 +1,103 @@
+﻿@model SAPSCaseManagement5.ViewModels.SuspectCriminalRecordsViewModel
+
+@{
+    ViewBag.Title = "Suspect and Criminal Records";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.3/css/jquery.dataTables.min.css">
+    <!-- jQuery UI CSS (for additional styling, optional) -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <!-- Bootstrap CSS (optional, for better styling) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <!-- Success and Error Messages -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <!-- Suspect Information Table -->
+        <h2>Suspect Information</h2>
+        <table id="dataTable id="suspectTable class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ID Number</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.Suspect.IDNumber</td>
+                    <td>@Model.Suspect.FirstName</td>
+                    <td>@Model.Suspect.LastName</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Criminal Records Table -->
+        <h2>Criminal Records</h2>
+        <table id="criminalRecordsTable" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Offense</th>
+                    <th>Sentence (Years)</th>
+                    <th>Issue Date</th>
+                    <th>Case Manager</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var record in Model.CriminalRecords)
+                {
+                    <tr>
+                        <td>@record.Offense?.OffenseName</td> <!-- Display Offense Name -->
+                        <td>@record.Sentence</td>
+                        <td>@record.IssueDate.ToString("yyyy/MM/dd")</td> <!-- Format date -->
+                        <td>@record.CaseManager?.ManagerName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Correct script loading order -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Load jQuery first -->
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.3/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.3/js/dataTables.jqueryui.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTables for both tables
+            $('#suspectTable').DataTable({
+                "searching": false,  // Disable searching for the suspect table
+                "paging": false,
+                "ordering": false
+            });
+
+            $('#criminalRecordsTable').DataTable({
+                "searching": true,   // Enable searching for criminal records
+                "paging": true,
+                "ordering": true,
+                "order": [[2, "desc"]]  // Default sorting by Issue Date
+            });
+        });
+    </script>
+</body>
+</html>
