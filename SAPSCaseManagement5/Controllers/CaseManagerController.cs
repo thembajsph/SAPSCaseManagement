@@ -185,7 +185,9 @@ namespace SAPSCaseManagement5.Controllers
                 {
                     ManagerName = viewModel.ManagerName,
                     Email = viewModel.Email,
-                    CaseCount = viewModel.CaseCount
+                    CaseCount = viewModel.CaseCount,
+                    UserId = "defaultUserId" // Assign a default UserId if necessary
+
                 };
 
                 _context.CaseManagers.Add(caseManager);
@@ -197,10 +199,6 @@ namespace SAPSCaseManagement5.Controllers
 
             return View(viewModel);
         }
-
-
-
+    }
 
     }
-}
-

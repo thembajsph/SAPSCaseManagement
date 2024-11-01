@@ -24,6 +24,8 @@ namespace SAPSCaseManagement5.ViewModels
 
         // Consider adding a list of offenses if you are selecting from a dropdown
         public IEnumerable<SelectListItem> Offenses { get; set; }
+
+        public string? UserId { get; set; } // Add UserId here
     }
 }
 

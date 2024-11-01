@@ -619,7 +619,7 @@ namespace SAPSCaseManagement5.Controllers
 
                 // Pass the current CaseManagerId and name to the view via ViewBag
                 ViewBag.CurrentCaseManagerId = currentCaseManagerId;
-                ViewBag.CurrentCaseManagerName = record.CaseManager?.ManagerName ?? "N/A";
+                ViewBag.CurrentCaseManagerName = record.CaseManager?.ManagerName;
 
                 return View(record);
             }
